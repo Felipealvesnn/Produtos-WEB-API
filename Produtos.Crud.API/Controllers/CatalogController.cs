@@ -8,13 +8,14 @@ namespace Produtos.Crud.API.Controllers;
 [Route("[controller]")]
 public class CatalogController: ControllerBase
 {
-    private List<ModelCatalogo> produto = new List< ModelCatalogo>{
+private List<ModelCatalogo> produto = new List< ModelCatalogo>{
 
 new ModelCatalogo{Id = 1, Nome = "Caneta azul"},
 new ModelCatalogo{Id = 2, Nome = "Caneta vermelha"},
 };
 
-[HttpGet ("itens")]
+
+    [HttpGet ("itens")]
 public JsonResult GetItems(){
 
 
@@ -41,7 +42,7 @@ public JsonResult PostItem([FromBody] ModelCatalogo item){
 
     produto.Add(item);
 
-    return new JsonResult(item);
+    return new JsonResult(produto);
 }
 [HttpPut ("itens/{id}")]
 public  JsonResult PutItem(int id, [FromBody] ModelCatalogo item){
@@ -72,7 +73,9 @@ public JsonResult DeleteItem(int id){
  
 
    
-    
+    bool existeId(int id){
+        return produto.Any(x => x.Id == id);
+    }
     
 
 
