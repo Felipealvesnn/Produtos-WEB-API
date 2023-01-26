@@ -1,82 +1,95 @@
 using Microsoft.AspNetCore.Mvc;
 using Produtos.Crud.API.Models;
+using Produtos.Crud.API.Util;
+using Produtos.Crud.API.ViewsModels;
 
 namespace Produtos.Crud.API.Controllers;
 
 
 [ApiController]
 [Route("[controller]")]
-public class CatalogController: ControllerBase
+public class CatalogController : ControllerBase
 {
-private List<ModelCatalogo> produto = new List< ModelCatalogo>{
+    private List<ModelCatalogo> produto = new List<ModelCatalogo>{
 
 new ModelCatalogo{Id = 1, Nome = "Caneta azul"},
 new ModelCatalogo{Id = 2, Nome = "Caneta vermelha"},
 };
 
 
-    [HttpGet ("itens")]
-public JsonResult GetItems(){
+    [HttpGet("itens")]
+    public ActionResult<IEnumerable<ModelCatalogo>> GetItems()
+    {
+        var produtos = CatalogToCatalogDTO.ToCatalogDTO(produto);
 
+        return Ok(
+               produtos
+            );
 
-    return new JsonResult(
-           produto
-        );
-
-}
-
-[HttpGet ("itens/{id}")]
-public JsonResult GetItem(int id){
-
-    var item = produto.SingleOrDefault(x => x.Id == id);
-    if(item == null){
-        Response.StatusCode = 404;
-        return new JsonResult(new {message = "Item não encontrado"});
     }
 
-    return new JsonResult(item);
-}
+    [HttpGet("itens/{id}")]
+    public ActionResult<ModelCatalogo> GetItem(int id)
+    {
+       
 
-[HttpPost ("itens")]
-public JsonResult PostItem([FromBody] ModelCatalogo item){
+        var item = produto.SingleOrDefault(x => x.Id == id);
+        if (item == null)
+        {
+            Response.StatusCode = 404;
+            return NotFound();             //new JsonResult(new {message = "Item não encontrado"});
+        }
 
-    produto.Add(item);
-
-    return new JsonResult(produto);
-}
-[HttpPut ("itens/{id}")]
-public  JsonResult PutItem(int id, [FromBody] ModelCatalogo item){
-
-    var itemAntigo =  produto.FirstOrDefault(x => x.Id == id);
-    if(itemAntigo == null){
-        Response.StatusCode = 404;
-        return new JsonResult(new {message = "Item não encontrado"});
+        return Ok(item.ToCatalogDTO());
     }
 
-    itemAntigo.Nome = item.Nome;
+    [HttpPost("itens")]
+    public ActionResult PostItem([FromBody] ModelCatalogo item)
+    {
 
-    return  new JsonResult(itemAntigo);
-}
-[HttpDelete ("itens/{id}")]
-public JsonResult DeleteItem(int id){
+        produto.Add(item);
 
-    var itemAntigo = produto.FirstOrDefault(x => x.Id == id);
-    if(itemAntigo == null){
-        Response.StatusCode = 404;
-        return new JsonResult(new {message = "Item não encontrado"});
+        Response.StatusCode = 201;
+        return Ok(produto);      //new JsonResult(produto);
+    }
+    [HttpPut("itens/{id}")]
+    public ActionResult PutItem(int id, [FromBody] ModelCatalogo item)
+    {
+
+        var itemAntigo = produto.FirstOrDefault(x => x.Id == id);
+        if (itemAntigo == null)
+        {
+            Response.StatusCode = 404;
+            return NotFound();                    //new JsonResult(new {message = "Item não encontrado"});
+        }
+
+        itemAntigo.Nome = item.Nome;
+
+        return new JsonResult(itemAntigo);
+    }
+    [HttpDelete("itens/{id}")]
+    public ActionResult DeleteItem(int id)
+    {
+
+        var itemAntigo = produto.FirstOrDefault(x => x.Id == id);
+        if (itemAntigo == null)
+        {
+            Response.StatusCode = 404;
+            return new JsonResult(new { message = "Item não encontrado" });
+        }
+
+        produto.Remove(itemAntigo);
+
+        return Ok(itemAntigo);
     }
 
-    produto.Remove(itemAntigo);
 
-    return new JsonResult(itemAntigo);
-}
- 
 
-   
-    bool existeId(int id){
+    bool existeId(int id)
+    {
         return produto.Any(x => x.Id == id);
     }
-    
+
 
 
 }

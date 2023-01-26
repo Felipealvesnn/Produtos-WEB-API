@@ -1,6 +1,7 @@
-namespace Produtos.Crud.API.Models;
+namespace Produtos.Crud.API.ViewsModels;
 
-public class ModelCatalogo{
+
+public class CatalogVM{
  
     public int Id {get; set;}
     public string Nome {get; set;} = string.Empty;
